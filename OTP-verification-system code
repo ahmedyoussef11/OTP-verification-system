@@ -1,0 +1,59 @@
+import random
+import smtplib
+import tkinter as tk
+from tkinter import messagebox
+
+class OTPVerificationApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title('OTP Verification System')
+
+        self.email_label = tk.Label(root, text='Enter your email address:')
+        self.email_label.pack()
+
+        self.email_entry = tk.Entry(root)
+        self.email_entry.pack()
+
+        self.generate_button = tk.Button(root, text='Generate OTP', command=self.generate_otp)
+        self.generate_button.pack()
+
+        self.otp_label = tk.Label(root, text='Enter the OTP you received:')
+        self.otp_label.pack()
+
+        self.otp_entry = tk.Entry(root)
+        self.otp_entry.pack()
+
+        self.verify_button = tk.Button(root, text='Verify OTP', command=self.verify_otp)
+        self.verify_button.pack()
+
+    def generate_otp(self):
+        self.generated_otp = str(random.randint(100000, 999999))
+        messagebox.showinfo('OTP Generated', f'Generated OTP: {self.generated_otp}')
+        self.send_email(self.email_entry.get(), self.generated_otp)
+
+    def send_email(self, email, otp):
+        sender_email = 'madaahmed1190@gmail.com'
+        app_password = 'eryikybjgamckbsv'
+
+        subject = 'Your OTP Verification Code'
+        message = f'Your OTP code is: {otp}'
+
+        try:
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                server.starttls()
+                server.login(sender_email, app_password)
+                server.sendmail(sender_email, email, f'Subject: {subject}\n\n{message}')
+        except Exception as e:
+            messagebox.showerror('Error', f'Error sending OTP: {e}')
+
+    def verify_otp(self):
+        user_input_otp = self.otp_entry.get()
+        if user_input_otp == self.generated_otp:
+            messagebox.showinfo('OTP Verification', 'OTP verification successful!')
+        else:
+            messagebox.showerror('OTP Verification', 'OTP verification failed.')
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    app = OTPVerificationApp(root)
+    root.mainloop()
